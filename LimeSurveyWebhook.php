@@ -72,13 +72,27 @@ class LimeSurveyWebhook extends PluginBase
                     ],
                     'help' => 'Maybe you need a token to verify your request? <br> This will be send in plain text / not encoded!'
                 ),
+                'sHeaderSignatureName' => array(
+                    'type' => 'string',
+                    'label' => 'Header Signature Name',
+                    'default' => $this->getGlobalSetting('sHeaderSignatureName', 'X-Signature-SHA256'),
+                    'htmlOptions' => [
+                        'readonly' => in_array('sHeaderSignatureName', $fixedPluginSettings)
+                    ],
+                    'help' => 'Header Signature Name. Default to X-Signature-SHA256.'
+                ),
+                'sHeaderSignaturePrefix' => array(
+                    'type' => 'string',
+                    'label' => 'Header Signature Prefix',
+                    'default' => $this->getGlobalSetting('sHeaderSignaturePrefix', ''),
+                    'htmlOptions' => [
+                        'readonly' => in_array('sHeaderSignaturePrefix', $fixedPluginSettings)
+                    ],
+                    'help' => 'Header Signature Prefix'
+                ),
                 'sBug' => array(
-                    'type' => 'select',
-                    'options' => array(
-                        0 => 'No',
-                        1 => 'Yes'
-                    ),
-                    'default' => $this->getGlobalSetting('sBug', 0),
+                    'type' => 'checkbox',
+                    'default' => $this->getGlobalSetting('sBug', false),
                     'htmlOptions' => [
                         'readonly' => in_array('sBug', $fixedPluginSettings)
                     ],
@@ -160,12 +174,11 @@ class LimeSurveyWebhook extends PluginBase
                 $lang = $languageRequest !== null ? $languageRequest : $surveyInfo->language; // Fallback to default language
 
                 // Get token from the URL manually
-                $usertoken = Yii::app()->request->getParam('token', null);
-                error_log($usertoken);
+                $token = Yii::app()->request->getParam('token', null);
+                error_log($token);
 
 				$url = $this->getGlobalSetting('sUrl');
                 $hookSurveyId = $this->getGlobalSetting('sId');
-                $auth = $this->getGlobalSetting('sAuthToken');
                 
                 // Validate webhook URL
                 if (filter_var($url, FILTER_VALIDATE_URL) === false) {
@@ -174,11 +187,10 @@ class LimeSurveyWebhook extends PluginBase
                 }
                 
                 $parameters = array(
-                    "api_token" => $auth,
                     "survey" => $surveyId,
                     "event" => $comment,
                     'lang' => $lang,
-                    "user_token" => $usertoken
+                    "token" => $token
                 );
                 
                 // Include response data only for completion
@@ -190,6 +202,7 @@ class LimeSurveyWebhook extends PluginBase
                     $parameters['response'] = $response;
                     $parameters['submitDate'] = $response['submitdate'];
                 }
+                error_log($url);
                 error_log(json_encode($parameters));
                 $hookSent = $this->httpPost($url, $parameters);
 
@@ -243,16 +256,38 @@ class LimeSurveyWebhook extends PluginBase
         ***** ***** ***** ***** *****/
         private function httpPost($url, $params)
             {
-                $postData = $params;
+                error_log('Webhook call started');
+                if (empty($url)) {
+                    error_log('Webhook call failed: No URL defined!');
+                    return; // No URL defined
+                }
+
+                // Encode the body as JSON
+                $postData = json_encode($params); 
+
+                // Initialize cURL session
                 $ch = curl_init();
-                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                //curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
                 curl_setopt($ch, CURLOPT_URL, $url);
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($ch, CURLOPT_HEADER, false);
-                curl_setopt($ch, CURLOPT_POST, count($postData));
+                curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+                $signingSecret = $this->getGlobalSetting('sAuthToken', '');
+                if($signingSecret !== '') {
+                    $signingHeaderName = $this->getGlobalSetting('sHeaderSignatureName');
+                    $signingPrefix = $this->getGlobalSetting('sHeaderSignaturePrefix');
+                    // Calculate HMAC
+                    $signature = hash_hmac("sha256", $sigPrefix . $postData, $signingSecret);
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, ["$signingHeaderName : $signature"]);
+                }
+                curl_setopt($ch, CURLOPT_POST, true);
                 curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
 
                 $output = curl_exec($ch);
+                
+                // Handle errors (optional)
+                if (curl_errno($ch)) {
+                    error_log('Webhook call failed: ' . curl_error($ch));
+                }
                 curl_close($ch);
                 return $output;
             }
@@ -262,7 +297,7 @@ class LimeSurveyWebhook extends PluginBase
         ***** ***** ***** ***** *****/
         private function debug($url, $parameters, $hookSent, $time_start, $response)
             {
-                if ($this->getGlobalSetting('sBug', 0) == 1)
+                if ($this->getGlobalSetting('sBug', false))
                   {
                     $this->log($comment);
                     $html = '<pre><br><br>----------------------------- DEBUG ----------------------------- <br><br>';
