@@ -154,11 +154,15 @@ class LimeSurveyWebhook extends PluginBase
                 error_log(json_encode($event));
                 $surveyId = $event->get('surveyId');
 
-                // Try to fetch the current or default language
+                // Try to fetch the current from the URL manually or default language
                 $surveyInfo = Survey::model()->findByPk($surveyId);
-                $lang = null !== $event->get('lang') ? $event->get('lang') : $surveyInfo->language; // Fallback to default language
+                $languageRequest=Yii::app()->request->getParam('lang', null);
+                $lang = $languageRequest !== null ? $languageRequest : $surveyInfo->language; // Fallback to default language
 
-				$submitDate = $response['submitdate'];
+                // Get token from the URL manually
+                $usertoken = Yii::app()->request->getParam('token', null);
+                error_log($usertoken);
+
 				$url = $this->getGlobalSetting('sUrl');
                 $hookSurveyId = $this->getGlobalSetting('sId');
                 $auth = $this->getGlobalSetting('sAuthToken');
@@ -168,32 +172,25 @@ class LimeSurveyWebhook extends PluginBase
                     error_log('Invalid webhook URL: ' . $url);
                     return; // Exit if the URL is not valid
                 }
-
-                // Get token from the URL manually
-                //$token = Yii::app()->request->getParam('token', null);
-                //if($token == null) {
-                //    $token = $event->get('token'); // Attempt to get from event object
-                //}
-
+                
                 $parameters = array(
                     "api_token" => $auth,
                     "survey" => $surveyId,
                     "event" => $comment,
-                    "respondId" => $responseId,
-                    "response" => $response,
-                    "submitDate" => $submitDate,
                     'lang' => $lang,
-                    "token" => isset($sToken) ? $sToken : null
+                    "user_token" => $usertoken
                 );
-
+                
                 // Include response data only for completion
-                if ($comment === 'survey_completed') {
+                if ($comment === 'afterSurveyComplete') {
                     $responseId = $event->get('responseId');
                     $parameters['responseId'] = $responseId;
                     // Fetch response data manually from the survey table
                     $response = $this->pluginManager->getAPI()->getResponse($surveyId, $responseId);
                     $parameters['response'] = $response;
+                    $parameters['submitDate'] = $response['submitdate'];
                 }
+                error_log(json_encode($parameters));
                 $hookSent = $this->httpPost($url, $parameters);
 
                 $this->log($comment . " | Params: ". json_encode($parameters) . json_encode($hookSent));
