@@ -117,7 +117,7 @@ class LimeSurveyWebhook extends PluginBase
             error_log("survey_initialized : " . $surveyId);
             $hookSurveyId = $this->getGlobalSetting('sId','');
             $hookSurveyIdArray = explode(',', preg_replace('/\s+/', '', $hookSurveyId));
-            if (in_array($surveyId, $hookSurveyIdArray) || empty($hookSurveyIdArray))
+            if (in_array($surveyId, $hookSurveyIdArray) || $hookSurveyId == '')
                 {
                     $this->callWebhook('beforeSurveyPage');
                 }
@@ -136,7 +136,7 @@ class LimeSurveyWebhook extends PluginBase
             error_log("survey_completed : " . $surveyId);
             $hookSurveyId = $this->getGlobalSetting('sId','');
             $hookSurveyIdArray = explode(',', preg_replace('/\s+/', '', $hookSurveyId));
-            if (in_array($surveyId, $hookSurveyIdArray) || empty($hookSurveyIdArray)) 
+            if (in_array($surveyId, $hookSurveyIdArray) || $hookSurveyId == '') 
             {
                 $this->callWebhook('afterSurveyComplete');
             }
