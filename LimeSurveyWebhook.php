@@ -267,6 +267,7 @@ class LimeSurveyWebhook extends PluginBase
 
                 // Initialize cURL session
                 $ch = curl_init();
+
                 //curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
                 curl_setopt($ch, CURLOPT_URL, $url);
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -277,7 +278,9 @@ class LimeSurveyWebhook extends PluginBase
                     $signingPrefix = $this->getGlobalSetting('sHeaderSignaturePrefix');
                     // Calculate HMAC
                     $signature = hash_hmac("sha256", $sigPrefix . $postData, $signingSecret);
-                    curl_setopt($ch, CURLOPT_HTTPHEADER, ["$signingHeaderName : $signature"]);
+                    $headerToAdd="$signingHeaderName: $signature";
+                    error_log($headerToAdd);
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, [$headerToAdd]);
                 }
                 curl_setopt($ch, CURLOPT_POST, true);
                 curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
