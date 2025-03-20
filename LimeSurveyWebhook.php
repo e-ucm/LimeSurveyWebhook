@@ -30,54 +30,117 @@ class LimeSurveyWebhook extends PluginBase
 
 		public function init()
 			{
-				$this->subscribe('afterSurveyComplete'); // After Survey Complete
+				// Hook into events triggered when a survey is completed and when a survey is initialized (before the first page is loaded)
+                $this->subscribe('afterSurveyComplete'); // This event will be triggered when a respondent completed the survey
+                $this->subscribe('beforeSurveyPage');  // This event will be triggered when a respondent initializes the survey
 			}
+        
+        protected $settings = [];
 
-		protected $settings = array(
-			'sUrl' => array(
-				'type' => 'string',
-				'label' => 'The default URL to send the webhook to:',
-				'help' => 'To test get one from https://webhook.site'
-			),
-			'sId' => array(
-				'type' => 'string',
-				'default' => '000000',
-				'label' => 'The ID of the surveys:',
-				'help' => 'The unique number of the surveys. You can set multiple surveys with an "," as separator. Example: 123456, 234567, 345678'
-			),
-      'sAuthToken' => array(
-        'type' => 'string',
-        'label' => 'API Authentication Token',
-        'help' => 'Maybe you need a token to verify your request? <br> This will be send in plain text / not encoded!'
-      ),
-			'sBug' => array(
-				'type' => 'select',
-				'options' => array(
-					0 => 'No',
-					1 => 'Yes'
-				),
-				'default' => 0,
-				'label' => 'Enable Debug Mode',
-				'help' => 'Enable debugmode to see what data is transmitted. Respondents will see this as well so you should turn this off for live surveys'
-			)
-		);
+        /**
+        * @param mixed $getValues
+        */
+        public function getPluginSettings($getValues = true) {
+            /* Definition and default */
+            $fixedPluginSettings = $this->getFixedGlobalSetting();
+		    $this->settings = array(
+                'sUrl' => array(
+                    'type' => 'string',
+                    'label' => 'The default URL to send the webhook to:',
+                    'default' => $this->getGlobalSetting('sUrl', ''),
+                    'htmlOptions' => [
+                        'readonly' => in_array('sUrl', $fixedPluginSettings)
+                    ],
+                    'help' => 'To test get one from https://webhook.site'
+                ),
+                'sId' => array(
+                    'type' => 'string',
+                    'default' => '000000',
+                    'label' => 'The ID of the surveys:',
+                    'default' => $this->getGlobalSetting('sId', ''),
+                    'htmlOptions' => [
+                        'readonly' => in_array('sId', $fixedPluginSettings)
+                    ],
+                    'help' => 'The unique number of the surveys. You can set multiple surveys with an "," as separator. Example: 123456, 234567, 345678'
+                ),
+                'sAuthToken' => array(
+                    'type' => 'string',
+                    'label' => 'API Authentication Token',
+                    'default' => $this->getGlobalSetting('sAuthToken', ''),
+                    'htmlOptions' => [
+                        'readonly' => in_array('sAuthToken', $fixedPluginSettings)
+                    ],
+                    'help' => 'Maybe you need a token to verify your request? <br> This will be send in plain text / not encoded!'
+                ),
+                'sBug' => array(
+                    'type' => 'select',
+                    'options' => array(
+                        0 => 'No',
+                        1 => 'Yes'
+                    ),
+                    'default' => $this->getGlobalSetting('sBug', 0),
+                    'htmlOptions' => [
+                        'readonly' => in_array('sBug', $fixedPluginSettings)
+                    ],
+                    'label' => 'Enable Debug Mode',
+                    'help' => 'Enable debugmode to see what data is transmitted. Respondents will see this as well so you should turn this off for live surveys'
+                )
+		    );
+
+            /* Get current */
+            $pluginSettings = parent::getPluginSettings($getValues);
+            error_log(json_encode($pluginSettings));
+            /* Update current for fixed one */
+            if ($getValues) {
+                foreach ($fixedPluginSettings as $setting) {
+                    $pluginSettings[$setting]['current'] = $this->getGlobalSetting($setting);
+                }
+            }
+            error_log(json_encode($pluginSettings));
+            /* Remove hidden */
+            foreach ($this->getHiddenGlobalSetting() as $setting) {
+                unset($pluginSettings[$setting]);
+            }
+            error_log(json_encode($pluginSettings));
+            return $pluginSettings;
+        }
+
+        
+		/***** ***** ***** ***** *****
+		* Send the webhook on completion of a survey
+		* @return array | response
+		***** ***** ***** ***** *****/
+		public function beforeSurveyPage()
+        {
+            $oEvent = $this->getEvent();
+            $surveyId = $oEvent->get('surveyId');
+            error_log("survey_initialized" . $surveyId);
+            $hookSurveyId = $this->get('sId', null, null, $this->settings['sId']);
+            $hookSurveyIdArray = explode(',', preg_replace('/\s+/', '', $hookSurveyId));
+            if (in_array($surveyId, $hookSurveyIdArray))
+                {
+                    $this->callWebhook('beforeSurveyPage');
+                }
+            return;
+        }
+
 
 		/***** ***** ***** ***** *****
 		* Send the webhook on completion of a survey
 		* @return array | response
 		***** ***** ***** ***** *****/
 		public function afterSurveyComplete()
-			{
-        $oEvent = $this->getEvent();
-        $surveyId = $oEvent->get('surveyId');
-        $hookSurveyId = $this->get('sId', null, null, $this->settings['sId']);
-        $hookSurveyIdArray = explode(',', preg_replace('/\s+/', '', $hookSurveyId));
-        if (in_array($surveyId, $hookSurveyIdArray))
-                    {
-                        $this->callWebhook('afterSurveyComplete');
-                    }
-				return;
-			}
+		{
+            $oEvent = $this->getEvent();
+            $surveyId = $oEvent->get('surveyId');
+            error_log("survey_completed" . $surveyId);
+            $hookSurveyId = $this->get('sId', null, null, $this->settings['sId']);
+            $hookSurveyIdArray = explode(',', preg_replace('/\s+/', '', $hookSurveyId));
+            if (in_array($surveyId, $hookSurveyIdArray)) {
+                $this->callWebhook('afterSurveyComplete');
+            }
+            return;
+		}
 
 		/***** ***** ***** ***** *****
 		* Calls a webhook
@@ -87,13 +150,30 @@ class LimeSurveyWebhook extends PluginBase
 			{
 				$time_start = microtime(true);
 				$event = $this->getEvent();
-				$surveyId = $event->get('surveyId');
-				$responseId = $event->get('responseId');
-				$response = $this->pluginManager->getAPI()->getResponse($surveyId, $responseId);
+                error_log(json_encode($event));
+                $surveyId = $event->get('surveyId');
+
+                // Try to fetch the current or default language
+                $surveyInfo = Survey::model()->findByPk($surveyId);
+                $lang = null !== $event->get('lang') ? $event->get('lang') : $surveyInfo->language; // Fallback to default language
+
 				$submitDate = $response['submitdate'];
-				$url = $this->get('sUrl', null, null, $this->settings['sUrl']);
-                $hookSurveyId = $this->get('sId', null, null, $this->settings['sId']);
-                $auth = $this->get('sAuthToken', null, null, $this->settings['sAuthToken']);
+				$url = $this->getGlobalSetting('sUrl');
+                $hookSurveyId = $this->getGlobalSetting('sId');
+                $auth = $this->getGlobalSetting('sAuthToken');
+                
+                // Validate webhook URL
+                if (filter_var($url, FILTER_VALIDATE_URL) === false) {
+                    error_log('Invalid webhook URL: ' . $url);
+                    return; // Exit if the URL is not valid
+                }
+
+                // Get token from the URL manually
+                //$token = Yii::app()->request->getParam('token', null);
+                //if($token == null) {
+                //    $token = $event->get('token'); // Attempt to get from event object
+                //}
+
                 $parameters = array(
                     "api_token" => $auth,
                     "survey" => $surveyId,
@@ -101,8 +181,18 @@ class LimeSurveyWebhook extends PluginBase
                     "respondId" => $responseId,
                     "response" => $response,
                     "submitDate" => $submitDate,
+                    'lang' => $lang,
                     "token" => isset($sToken) ? $sToken : null
                 );
+
+                // Include response data only for completion
+                if ($comment === 'survey_completed') {
+                    $responseId = $event->get('responseId');
+                    $parameters['responseId'] = $responseId;
+                    // Fetch response data manually from the survey table
+                    $response = $this->pluginManager->getAPI()->getResponse($surveyId, $responseId);
+                    $parameters['response'] = $response;
+                }
                 $hookSent = $this->httpPost($url, $parameters);
 
                 $this->log($comment . " | Params: ". json_encode($parameters) . json_encode($hookSent));
@@ -174,7 +264,7 @@ class LimeSurveyWebhook extends PluginBase
         ***** ***** ***** ***** *****/
         private function debug($url, $parameters, $hookSent, $time_start, $response)
             {
-                if ($this->get('sBug', null, null, $this->settings['sBug']) == 1)
+                if ($this->getGlobalSetting('sBug', 0) == 1)
                   {
                     $this->log($comment);
                     $html = '<pre><br><br>----------------------------- DEBUG ----------------------------- <br><br>';
@@ -186,5 +276,49 @@ class LimeSurveyWebhook extends PluginBase
                     $event = $this->getEvent();
                     $event->getContent($this)->addContent($html);
                   }
-		          }
+		    }
+
+        /**
+         * get settings according to current DB and fixed config.php
+         * @param string $setting
+         * @param mixed $default
+         * @return mixed
+         */
+        private function getGlobalSetting($setting, $default = null)
+            {
+                $AuthOAuth2Settings = App()->getConfig('WebHookStatusSettings');
+                if (isset($AuthOAuth2Settings['fixed'][$setting])) {
+                    return $AuthOAuth2Settings['fixed'][$setting];
+                }
+                if (isset($AuthOAuth2Settings[$setting])) {
+                    return $this->get($setting, null, null, $AuthOAuth2Settings[$setting]);
+                }
+                return $this->get($setting, null, null, $default);
+            }
+
+        /**
+         * Get the fixed settings name
+         * @return string[]
+         */
+        private function getFixedGlobalSetting()
+            {
+                $AuthOAuth2Setting = App()->getConfig('WebHookStatusSettings');
+                if (isset($AuthOAuth2Setting['fixed'])) {
+                    return array_keys($AuthOAuth2Setting['fixed']);
+                }
+                return [];
+            }
+
+        /**
+         * Get the hidden settings name
+         * @return string[]
+         */
+        private function getHiddenGlobalSetting()
+            {
+                $AuthOAuth2Setting = App()->getConfig('AuthOAuth2Settings');
+                if (isset($AuthOAuth2Setting['hidden'])) {
+                    return $AuthOAuth2Setting['hidden'];
+                }
+                return [];
+            }
     }
