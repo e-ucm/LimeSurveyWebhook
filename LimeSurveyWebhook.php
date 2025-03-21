@@ -207,7 +207,7 @@ class LimeSurveyWebhook extends PluginBase
                 $hookSent = $this->httpPost($url, $postData);
 
                 error_log($comment . " | Url sent : ". $url . " | Params: ". $postData . " | Response received : " . json_encode($hookSent));
-                $this->debug($url, $postData, $hookSent, $time_start, $comment);
+                $this->debug($url, $parameters, $hookSent, $time_start, $comment);
 
                 return;
             }
@@ -303,8 +303,9 @@ class LimeSurveyWebhook extends PluginBase
                   {
                     $this->log($comment);
                     $html = '<pre><br><br>----------------------------- DEBUG ----------------------------- <br><br>';
-                    $html .= 'Parameters: <br>' . print_r($parameters, true);
-                    $html .= 'Response: <br>' . print_r($hookSent, true);
+                    $html .= 'Comment: <br>' . print_r($comment, true);
+                    $html .= '<br><br>Parameters: <br>' . print_r($parameters, true);
+                    $html .= '<br><br>Response: <br>' . print_r($hookSent, true);
                     $html .= "<br><br> ----------------------------- <br><br>";
                     $html .= 'Hook sent to: ' . print_r($url, true) . '<br>';
                     $html .= 'Total execution time in seconds: ' . (microtime(true) - $time_start);
