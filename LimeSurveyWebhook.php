@@ -322,12 +322,12 @@ class LimeSurveyWebhook extends PluginBase
          */
         private function getGlobalSetting($setting, $default = null)
             {
-                $AuthOAuth2Settings = App()->getConfig('WebHookStatusSettings');
-                if (isset($AuthOAuth2Settings['fixed'][$setting])) {
-                    return $AuthOAuth2Settings['fixed'][$setting];
+                $WebhookSettings = App()->getConfig('WebHookStatusSettings');
+                if (isset($WebhookSettings['fixed'][$setting])) {
+                    return $WebhookSettings['fixed'][$setting];
                 }
-                if (isset($AuthOAuth2Settings[$setting])) {
-                    return $this->get($setting, null, null, $AuthOAuth2Settings[$setting]);
+                if (isset($WebhookSettings[$setting])) {
+                    return $this->get($setting, null, null, $WebhookSettings[$setting]);
                 }
                 return $this->get($setting, null, null, $default);
             }
@@ -338,9 +338,9 @@ class LimeSurveyWebhook extends PluginBase
          */
         private function getFixedGlobalSetting()
             {
-                $AuthOAuth2Setting = App()->getConfig('WebHookStatusSettings');
-                if (isset($AuthOAuth2Setting['fixed'])) {
-                    return array_keys($AuthOAuth2Setting['fixed']);
+                $WebhookSettings = App()->getConfig('WebHookStatusSettings');
+                if (isset($WebhookSettings['fixed'])) {
+                    return array_keys($WebhookSettings['fixed']);
                 }
                 return [];
             }
@@ -351,9 +351,9 @@ class LimeSurveyWebhook extends PluginBase
          */
         private function getHiddenGlobalSetting()
             {
-                $AuthOAuth2Setting = App()->getConfig('AuthOAuth2Settings');
-                if (isset($AuthOAuth2Setting['hidden'])) {
-                    return $AuthOAuth2Setting['hidden'];
+                $WebhookSettings = App()->getConfig('WebHookStatusSettings');
+                if (isset($WebhookSettings['hidden'])) {
+                    return $WebhookSettings['hidden'];
                 }
                 return [];
             }
