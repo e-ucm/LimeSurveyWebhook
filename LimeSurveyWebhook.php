@@ -203,11 +203,11 @@ class LimeSurveyWebhook extends PluginBase
                     $parameters['submitDate'] = $response['submitdate'];
                 }
                 error_log($url);
-                error_log(json_encode($parameters));
-                $hookSent = $this->httpPost($url, $parameters);
+                $postData=json_encode($parameters);
+                $hookSent = $this->httpPost($url, $postData);
 
-                $this->log($comment . " | Params: ". json_encode($parameters) . json_encode($hookSent));
-                $this->debug($url, $parameters, $hookSent, $time_start, $response);
+                error_log($comment . " | Url sent : ". $url . " | Params: ". $postData . " | Response received : " . json_encode($hookSent));
+                $this->debug($url, $postData, $hookSent, $time_start, $comment);
 
                 return;
             }
@@ -254,7 +254,7 @@ class LimeSurveyWebhook extends PluginBase
         * creates and executes a POST request
         * returns the output
         ***** ***** ***** ***** *****/
-        private function httpPost($url, $params)
+        private function httpPost($url, $postData)
             {
                 error_log('Webhook call started');
                 if (empty($url)) {
@@ -262,16 +262,16 @@ class LimeSurveyWebhook extends PluginBase
                     return; // No URL defined
                 }
 
-                // Encode the body as JSON
-                $postData = json_encode($params); 
-
                 // Initialize cURL session
-                $ch = curl_init();
+                $ch = curl_init($url);
 
-                //curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-                curl_setopt($ch, CURLOPT_URL, $url);
+                curl_setopt($ch, CURLOPT_POST, true);
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+                $headers=[
+                    'Content-Type: application/json',
+                    "Content-Length: " . strlen($postData) // Helps some servers parse JSON correctly
+                ];
                 $signingSecret = $this->getGlobalSetting('sAuthToken', '');
                 if($signingSecret !== '') {
                     $signingHeaderName = $this->getGlobalSetting('sHeaderSignatureName');
@@ -279,11 +279,10 @@ class LimeSurveyWebhook extends PluginBase
                     // Calculate HMAC
                     $signature = hash_hmac("sha256", $sigPrefix . $postData, $signingSecret);
                     $headerToAdd="$signingHeaderName: $signature";
-                    error_log($headerToAdd);
-                    curl_setopt($ch, CURLOPT_HTTPHEADER, [$headerToAdd]);
+                    $headers[] = $headerToAdd;
                 }
-                curl_setopt($ch, CURLOPT_POST, true);
-                curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+                error_log(implode(" , ", $headers));
+                curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
                 $output = curl_exec($ch);
                 
@@ -298,13 +297,14 @@ class LimeSurveyWebhook extends PluginBase
         /***** ***** ***** ***** *****
         * debugging
         ***** ***** ***** ***** *****/
-        private function debug($url, $parameters, $hookSent, $time_start, $response)
+        private function debug($url, $parameters, $hookSent, $time_start, $comment)
             {
                 if ($this->getGlobalSetting('sBug', false))
                   {
                     $this->log($comment);
                     $html = '<pre><br><br>----------------------------- DEBUG ----------------------------- <br><br>';
                     $html .= 'Parameters: <br>' . print_r($parameters, true);
+                    $html .= 'Response: <br>' . print_r($hookSent, true);
                     $html .= "<br><br> ----------------------------- <br><br>";
                     $html .= 'Hook sent to: ' . print_r($url, true) . '<br>';
                     $html .= 'Total execution time in seconds: ' . (microtime(true) - $time_start);
