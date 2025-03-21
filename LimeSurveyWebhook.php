@@ -322,7 +322,7 @@ class LimeSurveyWebhook extends PluginBase
          */
         private function getGlobalSetting($setting, $default = null)
             {
-                $WebhookSettings = App()->getConfig('WebHookStatusSettings');
+                $WebhookSettings = App()->getConfig('WebhookSettings');
                 if (isset($WebhookSettings['fixed'][$setting])) {
                     return $WebhookSettings['fixed'][$setting];
                 }
@@ -338,7 +338,7 @@ class LimeSurveyWebhook extends PluginBase
          */
         private function getFixedGlobalSetting()
             {
-                $WebhookSettings = App()->getConfig('WebHookStatusSettings');
+                $WebhookSettings = App()->getConfig('WebhookSettings');
                 if (isset($WebhookSettings['fixed'])) {
                     return array_keys($WebhookSettings['fixed']);
                 }
@@ -351,7 +351,7 @@ class LimeSurveyWebhook extends PluginBase
          */
         private function getHiddenGlobalSetting()
             {
-                $WebhookSettings = App()->getConfig('WebHookStatusSettings');
+                $WebhookSettings = App()->getConfig('WebhookSettings');
                 if (isset($WebhookSettings['hidden'])) {
                     return $WebhookSettings['hidden'];
                 }
