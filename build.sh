@@ -59,16 +59,20 @@ while [[ $# -gt 0 ]]; do
 done
 
 echo $SCRIPT_DIR
-plugin_name=$(basename $SCRIPT_DIR);
-echo $plugin_name
+PLUGIN_NAME=$(basename $SCRIPT_DIR);
 
 if [[ -d "$SCRIPT_DIR/builds-$BUILD_VERSION" ]]; then 
   rm -rf "$SCRIPT_DIR/builds-$BUILD_VERSION"
 fi
 mkdir "$SCRIPT_DIR/builds-$BUILD_VERSION"
 
-zip -r $SCRIPT_DIR/builds-$BUILD_VERSION/$plugin_name-$BUILD_VERSION.zip $SCRIPT_DIR/ -x "*.git*" "*build.sh*" "*builds-*" "*Readme.md*"
+pushd "$SCRIPT_DIR"
+zip -r $SCRIPT_DIR/builds-$BUILD_VERSION/$PLUGIN_NAME-$BUILD_VERSION.zip ./ -x "*.git*" "*build.sh*" "*builds-*" "*.md*"
+popd
 
 pushd "$SCRIPT_DIR/builds-$BUILD_VERSION"
 sha256sum ./* > "$SCRIPT_DIR/builds-$BUILD_VERSION/SHA256SUMS"
 popd
+
+# Success message
+echo "Plugin '$PLUGIN_NAME' has been packaged into '$SCRIPT_DIR/builds-$BUILD_VERSION/$PLUGIN_NAME-$BUILD_VERSION.zip'."
