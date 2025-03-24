@@ -67,7 +67,7 @@ fi
 mkdir "$SCRIPT_DIR/builds-$BUILD_VERSION"
 
 pushd "$SCRIPT_DIR"
-zip -r $SCRIPT_DIR/builds-$BUILD_VERSION/$PLUGIN_NAME-$BUILD_VERSION.zip ./ -x "*.git*" "*build.sh*" "*builds-*" "*.md*"
+zip -r $SCRIPT_DIR/builds-$BUILD_VERSION/$PLUGIN_NAME-$BUILD_VERSION.zip ./ -x "*.git*" "*.sh*" "*builds-*" "*.md*"  "*.csv*" "*generated*"
 popd
 
 pushd "$SCRIPT_DIR/builds-$BUILD_VERSION"
