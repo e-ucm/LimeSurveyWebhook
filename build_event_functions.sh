@@ -6,7 +6,7 @@ set -eo pipefail
 CSV_FILE="eventList.csv"
 OUTPUT_FILE="generated_code.php"
 JSON_FILE="generated_events.json"
-JSON_ONLINE_FILE="generated_online_events.json"
+JSON_ONLINE_FILE="generated_oneline_events.json"
 
 # Start writing the PHP file
 echo "<?php" > "$OUTPUT_FILE"
@@ -26,7 +26,7 @@ echo "" >> "$OUTPUT_FILE"
 while IFS=',' read -r event type; do
     echo "    public function $event() {" >> "$OUTPUT_FILE"
     echo "        if (\$this->isEventOn('$event')) {" >> "$OUTPUT_FILE"
-    if [[ $type == "survey" ]]; then
+    if [[ $type == "surveyStatus" ]]; then
         echo "            \$this->callWebhookSurvey('$event');" >> "$OUTPUT_FILE"
     else 
         echo "            \$this->callWebhook('$event');" >> "$OUTPUT_FILE"
