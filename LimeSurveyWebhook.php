@@ -82,14 +82,6 @@ class LimeSurveyWebhook extends PluginBase
                 $this->subscribe('onSurveyDenied');
                 $this->subscribe('setVariableExpressionEnd');
                 $this->subscribe('saveSurveyForm');
-                $this->subscribe('newLoginForm');
-                $this->subscribe('afterLoginFormSubmit');
-                $this->subscribe('afterSuccessfulLogin');
-                $this->subscribe('newUserLogin');
-                $this->subscribe('newUserSession');
-                $this->subscribe('afterLogout');
-                $this->subscribe('afterFailedLoginAttempt');
-                $this->subscribe('remoteControlLogin');
                 $this->subscribe('afterReceiveOAuthResponse');
                 $this->subscribe('afterSelectEmailPlugin');
                 $this->subscribe('beforeEmail');
@@ -124,8 +116,610 @@ class LimeSurveyWebhook extends PluginBase
                 $this->subscribe('beforeModelSave');
                 $this->subscribe('afterModelDelete');
                 $this->subscribe('afterModelSave');
-			}
-        
+            }
+
+            public function afterFindSurvey() {
+                if ($this->isEventOn('afterFindSurvey')) {
+                    $this->callWebhook('afterFindSurvey');
+                }
+                return;
+            }
+
+            public function afterGenerateToken() {
+                if ($this->isEventOn('afterGenerateToken')) {
+                    $this->callWebhook('afterGenerateToken');
+                }
+                return;
+            }
+
+            public function afterPluginLoad() {
+                if ($this->isEventOn('afterPluginLoad')) {
+                    $this->callWebhook('afterPluginLoad');
+                }
+                return;
+            }
+
+            public function afterQuickMenuLoad() {
+                if ($this->isEventOn('afterQuickMenuLoad')) {
+                    $this->callWebhook('afterQuickMenuLoad');
+                }
+                return;
+            }
+
+            public function afterSurveyActivate() {
+                if ($this->isEventOn('afterSurveyActivate')) {
+                    $this->callWebhook('afterSurveyActivate');
+                }
+                return;
+            }
+
+            public function afterSurveyComplete() {
+                if ($this->isEventOn('afterSurveyComplete')) {
+                    $this->callWebhookSurvey('afterSurveyComplete');
+                }
+                return;
+            }
+
+            public function afterSurveyDeactivate() {
+                if ($this->isEventOn('afterSurveyDeactivate')) {
+                    $this->callWebhook('afterSurveyDeactivate');
+                }
+                return;
+            }
+
+            public function afterSurveyQuestionAssessment() {
+                if ($this->isEventOn('afterSurveyQuestionAssessment')) {
+                    $this->callWebhook('afterSurveyQuestionAssessment');
+                }
+                return;
+            }
+
+            public function afterSurveyQuota() {
+                if ($this->isEventOn('afterSurveyQuota')) {
+                    $this->callWebhook('afterSurveyQuota');
+                }
+                return;
+            }
+
+            public function afterSurveySettingsSave() {
+                if ($this->isEventOn('afterSurveySettingsSave')) {
+                    $this->callWebhook('afterSurveySettingsSave');
+                }
+                return;
+            }
+
+            public function beforeActivate() {
+                if ($this->isEventOn('beforeActivate')) {
+                    $this->callWebhook('beforeActivate');
+                }
+                return;
+            }
+
+            public function beforeAdminMenuRender() {
+                if ($this->isEventOn('beforeAdminMenuRender')) {
+                    $this->callWebhook('beforeAdminMenuRender');
+                }
+                return;
+            }
+
+            public function beforeCloseHtml() {
+                if ($this->isEventOn('beforeCloseHtml')) {
+                    $this->callWebhook('beforeCloseHtml');
+                }
+                return;
+            }
+
+            public function beforeControllerAction() {
+                if ($this->isEventOn('beforeControllerAction')) {
+                    $this->callWebhook('beforeControllerAction');
+                }
+                return;
+            }
+
+            public function beforeDeactivate() {
+                if ($this->isEventOn('beforeDeactivate')) {
+                    $this->callWebhook('beforeDeactivate');
+                }
+                return;
+            }
+
+            public function beforeHasPermission() {
+                if ($this->isEventOn('beforeHasPermission')) {
+                    $this->callWebhook('beforeHasPermission');
+                }
+                return;
+            }
+
+            public function beforeLoadResponse() {
+                if ($this->isEventOn('beforeLoadResponse')) {
+                    $this->callWebhook('beforeLoadResponse');
+                }
+                return;
+            }
+
+            public function beforePermissionSetSave() {
+                if ($this->isEventOn('beforePermissionSetSave')) {
+                    $this->callWebhook('beforePermissionSetSave');
+                }
+                return;
+            }
+
+            public function beforeProcessFileUpload() {
+                if ($this->isEventOn('beforeProcessFileUpload')) {
+                    $this->callWebhook('beforeProcessFileUpload');
+                }
+                return;
+            }
+
+            public function beforePluginManagerMenuRender() {
+                if ($this->isEventOn('beforePluginManagerMenuRender')) {
+                    $this->callWebhook('beforePluginManagerMenuRender');
+                }
+                return;
+            }
+
+            public function beforeQuestionRender() {
+                if ($this->isEventOn('beforeQuestionRender')) {
+                    $this->callWebhook('beforeQuestionRender');
+                }
+                return;
+            }
+
+            public function beforeRegister() {
+                if ($this->isEventOn('beforeRegister')) {
+                    $this->callWebhook('beforeRegister');
+                }
+                return;
+            }
+
+            public function beforeRegisterForm() {
+                if ($this->isEventOn('beforeRegisterForm')) {
+                    $this->callWebhook('beforeRegisterForm');
+                }
+                return;
+            }
+
+            public function beforeSideMenuRender() {
+                if ($this->isEventOn('beforeSideMenuRender')) {
+                    $this->callWebhook('beforeSideMenuRender');
+                }
+                return;
+            }
+
+            public function beforeSurveyAdminView() {
+                if ($this->isEventOn('beforeSurveyAdminView')) {
+                    $this->callWebhook('beforeSurveyAdminView');
+                }
+                return;
+            }
+
+            public function beforeSurveyActivate() {
+                if ($this->isEventOn('beforeSurveyActivate')) {
+                    $this->callWebhook('beforeSurveyActivate');
+                }
+                return;
+            }
+
+            public function beforeSurveyBarRender() {
+                if ($this->isEventOn('beforeSurveyBarRender')) {
+                    $this->callWebhook('beforeSurveyBarRender');
+                }
+                return;
+            }
+
+            public function beforeSurveyDeactivate() {
+                if ($this->isEventOn('beforeSurveyDeactivate')) {
+                    $this->callWebhook('beforeSurveyDeactivate');
+                }
+                return;
+            }
+
+            public function beforeSurveyPage() {
+                if ($this->isEventOn('beforeSurveyPage')) {
+                    $this->callWebhookSurvey('beforeSurveyPage');
+                }
+                return;
+            }
+
+            public function beforeSurveySettings() {
+                if ($this->isEventOn('beforeSurveySettings')) {
+                    $this->callWebhook('beforeSurveySettings');
+                }
+                return;
+            }
+
+            public function beforeTwigRenderTemplate() {
+                if ($this->isEventOn('beforeTwigRenderTemplate')) {
+                    $this->callWebhook('beforeTwigRenderTemplate');
+                }
+                return;
+            }
+
+            public function beforeToolsMenuRender() {
+                if ($this->isEventOn('beforeToolsMenuRender')) {
+                    $this->callWebhook('beforeToolsMenuRender');
+                }
+                return;
+            }
+
+            public function beforeUrlCheck() {
+                if ($this->isEventOn('beforeUrlCheck')) {
+                    $this->callWebhook('beforeUrlCheck');
+                }
+                return;
+            }
+
+            public function beforeWelcomePageRender() {
+                if ($this->isEventOn('beforeWelcomePageRender')) {
+                    $this->callWebhook('beforeWelcomePageRender');
+                }
+                return;
+            }
+
+            public function createNewUser() {
+                if ($this->isEventOn('createNewUser')) {
+                    $this->callWebhook('createNewUser');
+                }
+                return;
+            }
+
+            public function createRandomPassword() {
+                if ($this->isEventOn('createRandomPassword')) {
+                    $this->callWebhook('createRandomPassword');
+                }
+                return;
+            }
+
+            public function checkPasswordRequirement() {
+                if ($this->isEventOn('checkPasswordRequirement')) {
+                    $this->callWebhook('checkPasswordRequirement');
+                }
+                return;
+            }
+
+            public function ExpressionManagerStart() {
+                if ($this->isEventOn('ExpressionManagerStart')) {
+                    $this->callWebhook('ExpressionManagerStart');
+                }
+                return;
+            }
+
+            public function getGlobalBasePermissions() {
+                if ($this->isEventOn('getGlobalBasePermissions')) {
+                    $this->callWebhook('getGlobalBasePermissions');
+                }
+                return;
+            }
+
+            public function getPluginTwigPath() {
+                if ($this->isEventOn('getPluginTwigPath')) {
+                    $this->callWebhook('getPluginTwigPath');
+                }
+                return;
+            }
+
+            public function getValidScreenFiles() {
+                if ($this->isEventOn('getValidScreenFiles')) {
+                    $this->callWebhook('getValidScreenFiles');
+                }
+                return;
+            }
+
+            public function listExportOptions() {
+                if ($this->isEventOn('listExportOptions')) {
+                    $this->callWebhook('listExportOptions');
+                }
+                return;
+            }
+
+            public function listExportPlugins() {
+                if ($this->isEventOn('listExportPlugins')) {
+                    $this->callWebhook('listExportPlugins');
+                }
+                return;
+            }
+
+            public function listQuestionPlugins() {
+                if ($this->isEventOn('listQuestionPlugins')) {
+                    $this->callWebhook('listQuestionPlugins');
+                }
+                return;
+            }
+
+            public function newDirectRequest() {
+                if ($this->isEventOn('newDirectRequest')) {
+                    $this->callWebhook('newDirectRequest');
+                }
+                return;
+            }
+
+            public function newExport() {
+                if ($this->isEventOn('newExport')) {
+                    $this->callWebhook('newExport');
+                }
+                return;
+            }
+
+            public function newQuestionAttributes() {
+                if ($this->isEventOn('newQuestionAttributes')) {
+                    $this->callWebhook('newQuestionAttributes');
+                }
+                return;
+            }
+
+            public function newSurveySettings() {
+                if ($this->isEventOn('newSurveySettings')) {
+                    $this->callWebhook('newSurveySettings');
+                }
+                return;
+            }
+
+            public function NewUnsecureRequest() {
+                if ($this->isEventOn('NewUnsecureRequest')) {
+                    $this->callWebhook('NewUnsecureRequest');
+                }
+                return;
+            }
+
+            public function onSurveyDenied() {
+                if ($this->isEventOn('onSurveyDenied')) {
+                    $this->callWebhookSurvey('onSurveyDenied');
+                }
+                return;
+            }
+
+            public function setVariableExpressionEnd() {
+                if ($this->isEventOn('setVariableExpressionEnd')) {
+                    $this->callWebhook('setVariableExpressionEnd');
+                }
+                return;
+            }
+
+            public function saveSurveyForm() {
+                if ($this->isEventOn('saveSurveyForm')) {
+                    $this->callWebhook('saveSurveyForm');
+                }
+                return;
+            }
+
+            public function afterReceiveOAuthResponse() {
+                if ($this->isEventOn('afterReceiveOAuthResponse')) {
+                    $this->callWebhook('afterReceiveOAuthResponse');
+                }
+                return;
+            }
+
+            public function afterSelectEmailPlugin() {
+                if ($this->isEventOn('afterSelectEmailPlugin')) {
+                    $this->callWebhook('afterSelectEmailPlugin');
+                }
+                return;
+            }
+
+            public function beforeEmail() {
+                if ($this->isEventOn('beforeEmail')) {
+                    $this->callWebhook('beforeEmail');
+                }
+                return;
+            }
+
+            public function beforeSurveyEmail() {
+                if ($this->isEventOn('beforeSurveyEmail')) {
+                    $this->callWebhook('beforeSurveyEmail');
+                }
+                return;
+            }
+
+            public function beforeTokenEmail() {
+                if ($this->isEventOn('beforeTokenEmail')) {
+                    $this->callWebhook('beforeTokenEmail');
+                }
+                return;
+            }
+
+            public function beforeEmailDispatch() {
+                if ($this->isEventOn('beforeEmailDispatch')) {
+                    $this->callWebhook('beforeEmailDispatch');
+                }
+                return;
+            }
+
+            public function beforePrepareRedirectToAuthPage() {
+                if ($this->isEventOn('beforePrepareRedirectToAuthPage')) {
+                    $this->callWebhook('beforePrepareRedirectToAuthPage');
+                }
+                return;
+            }
+
+            public function beforeRedirectToAuthPage() {
+                if ($this->isEventOn('beforeRedirectToAuthPage')) {
+                    $this->callWebhook('beforeRedirectToAuthPage');
+                }
+                return;
+            }
+
+            public function listEmailPlugins() {
+                if ($this->isEventOn('listEmailPlugins')) {
+                    $this->callWebhook('listEmailPlugins');
+                }
+                return;
+            }
+
+            public function MailerConstruct() {
+                if ($this->isEventOn('MailerConstruct')) {
+                    $this->callWebhook('MailerConstruct');
+                }
+                return;
+            }
+
+            public function beforeSurveyDelete() {
+                if ($this->isEventOn('beforeSurveyDelete')) {
+                    $this->callWebhook('beforeSurveyDelete');
+                }
+                return;
+            }
+
+            public function beforeSurveySave() {
+                if ($this->isEventOn('beforeSurveySave')) {
+                    $this->callWebhook('beforeSurveySave');
+                }
+                return;
+            }
+
+            public function afterSurveyDelete() {
+                if ($this->isEventOn('afterSurveyDelete')) {
+                    $this->callWebhook('afterSurveyDelete');
+                }
+                return;
+            }
+
+            public function afterSurveySave() {
+                if ($this->isEventOn('afterSurveySave')) {
+                    $this->callWebhook('afterSurveySave');
+                }
+                return;
+            }
+
+            public function beforeTokenDelete() {
+                if ($this->isEventOn('beforeTokenDelete')) {
+                    $this->callWebhook('beforeTokenDelete');
+                }
+                return;
+            }
+
+            public function beforeTokenSave() {
+                if ($this->isEventOn('beforeTokenSave')) {
+                    $this->callWebhook('beforeTokenSave');
+                }
+                return;
+            }
+
+            public function afterTokenDelete() {
+                if ($this->isEventOn('afterTokenDelete')) {
+                    $this->callWebhook('afterTokenDelete');
+                }
+                return;
+            }
+
+            public function afterTokenSave() {
+                if ($this->isEventOn('afterTokenSave')) {
+                    $this->callWebhook('afterTokenSave');
+                }
+                return;
+            }
+
+            public function beforeResponseDelete() {
+                if ($this->isEventOn('beforeResponseDelete')) {
+                    $this->callWebhook('beforeResponseDelete');
+                }
+                return;
+            }
+
+            public function beforeResponseSave() {
+                if ($this->isEventOn('beforeResponseSave')) {
+                    $this->callWebhook('beforeResponseSave');
+                }
+                return;
+            }
+
+            public function afterResponseDelete() {
+                if ($this->isEventOn('afterResponseDelete')) {
+                    $this->callWebhook('afterResponseDelete');
+                }
+                return;
+            }
+
+            public function afterResponseSave() {
+                if ($this->isEventOn('afterResponseSave')) {
+                    $this->callWebhook('afterResponseSave');
+                }
+                return;
+            }
+
+            public function beforeTokenDynamicDelete() {
+                if ($this->isEventOn('beforeTokenDynamicDelete')) {
+                    $this->callWebhook('beforeTokenDynamicDelete');
+                }
+                return;
+            }
+
+            public function beforeTokenDynamicSave() {
+                if ($this->isEventOn('beforeTokenDynamicSave')) {
+                    $this->callWebhook('beforeTokenDynamicSave');
+                }
+                return;
+            }
+
+            public function afterTokenDynamicDelete() {
+                if ($this->isEventOn('afterTokenDynamicDelete')) {
+                    $this->callWebhook('afterTokenDynamicDelete');
+                }
+                return;
+            }
+
+            public function afterTokenDynamicSave() {
+                if ($this->isEventOn('afterTokenDynamicSave')) {
+                    $this->callWebhook('afterTokenDynamicSave');
+                }
+                return;
+            }
+
+            public function beforeSurveyDynamicDelete() {
+                if ($this->isEventOn('beforeSurveyDynamicDelete')) {
+                    $this->callWebhook('beforeSurveyDynamicDelete');
+                }
+                return;
+            }
+
+            public function beforeSurveyDynamicSave() {
+                if ($this->isEventOn('beforeSurveyDynamicSave')) {
+                    $this->callWebhook('beforeSurveyDynamicSave');
+                }
+                return;
+            }
+
+            public function afterSurveyDynamicDelete() {
+                if ($this->isEventOn('afterSurveyDynamicDelete')) {
+                    $this->callWebhook('afterSurveyDynamicDelete');
+                }
+                return;
+            }
+
+            public function afterSurveyDynamicSave() {
+                if ($this->isEventOn('afterSurveyDynamicSave')) {
+                    $this->callWebhook('afterSurveyDynamicSave');
+                }
+                return;
+            }
+
+            public function beforeModelDelete() {
+                if ($this->isEventOn('beforeModelDelete')) {
+                    $this->callWebhook('beforeModelDelete');
+                }
+                return;
+            }
+
+            public function beforeModelSave() {
+                if ($this->isEventOn('beforeModelSave')) {
+                    $this->callWebhook('beforeModelSave');
+                }
+                return;
+            }
+
+            public function afterModelDelete() {
+                if ($this->isEventOn('afterModelDelete')) {
+                    $this->callWebhook('afterModelDelete');
+                }
+                return;
+            }
+
+            public function afterModelSave() {
+                if ($this->isEventOn('afterModelSave')) {
+                    $this->callWebhook('afterModelSave');
+                }
+                return;
+            }
+
         protected $settings = [];
 
         /**
@@ -223,664 +817,6 @@ class LimeSurveyWebhook extends PluginBase
             return $pluginSettings;
         }
 
-        public function afterFindSurvey() {
-            if ($this->isEventOn('afterFindSurvey')) {
-                $this->callWebhookSurvey('afterFindSurvey');
-            }
-            return;
-        }
-    
-        public function afterGenerateToken() {
-            if ($this->isEventOn('afterGenerateToken')) {
-                $this->callWebhook('afterGenerateToken');
-            }
-            return;
-        }
-    
-        public function afterPluginLoad() {
-            if ($this->isEventOn('afterPluginLoad')) {
-                $this->callWebhook('afterPluginLoad');
-            }
-            return;
-        }
-    
-        public function afterQuickMenuLoad() {
-            if ($this->isEventOn('afterQuickMenuLoad')) {
-                $this->callWebhook('afterQuickMenuLoad');
-            }
-            return;
-        }
-    
-        public function afterSurveyActivate() {
-            if ($this->isEventOn('afterSurveyActivate')) {
-                $this->callWebhookSurvey('afterSurveyActivate');
-            }
-            return;
-        }
-    
-        public function afterSurveyComplete() {
-            if ($this->isEventOn('afterSurveyComplete')) {
-                $this->callWebhookSurvey('afterSurveyComplete');
-            }
-            return;
-        }
-    
-        public function afterSurveyDeactivate() {
-            if ($this->isEventOn('afterSurveyDeactivate')) {
-                $this->callWebhookSurvey('afterSurveyDeactivate');
-            }
-            return;
-        }
-    
-        public function afterSurveyQuestionAssessment() {
-            if ($this->isEventOn('afterSurveyQuestionAssessment')) {
-                $this->callWebhookSurvey('afterSurveyQuestionAssessment');
-            }
-            return;
-        }
-    
-        public function afterSurveyQuota() {
-            if ($this->isEventOn('afterSurveyQuota')) {
-                $this->callWebhookSurvey('afterSurveyQuota');
-            }
-            return;
-        }
-    
-        public function afterSurveySettingsSave() {
-            if ($this->isEventOn('afterSurveySettingsSave')) {
-                $this->callWebhookSurvey('afterSurveySettingsSave');
-            }
-            return;
-        }
-    
-        public function beforeActivate() {
-            if ($this->isEventOn('beforeActivate')) {
-                $this->callWebhookSurvey('beforeActivate');
-            }
-            return;
-        }
-    
-        public function beforeAdminMenuRender() {
-            if ($this->isEventOn('beforeAdminMenuRender')) {
-                $this->callWebhook('beforeAdminMenuRender');
-            }
-            return;
-        }
-    
-        public function beforeCloseHtml() {
-            if ($this->isEventOn('beforeCloseHtml')) {
-                $this->callWebhook('beforeCloseHtml');
-            }
-            return;
-        }
-    
-        public function beforeControllerAction() {
-            if ($this->isEventOn('beforeControllerAction')) {
-                $this->callWebhook('beforeControllerAction');
-            }
-            return;
-        }
-    
-        public function beforeDeactivate() {
-            if ($this->isEventOn('beforeDeactivate')) {
-                $this->callWebhookSurvey('beforeDeactivate');
-            }
-            return;
-        }
-    
-        public function beforeHasPermission() {
-            if ($this->isEventOn('beforeHasPermission')) {
-                $this->callWebhook('beforeHasPermission');
-            }
-            return;
-        }
-    
-        public function beforeLoadResponse() {
-            if ($this->isEventOn('beforeLoadResponse')) {
-                $this->callWebhookSurvey('beforeLoadResponse');
-            }
-            return;
-        }
-    
-        public function beforePermissionSetSave() {
-            if ($this->isEventOn('beforePermissionSetSave')) {
-                $this->callWebhook('beforePermissionSetSave');
-            }
-            return;
-        }
-    
-        public function beforeProcessFileUpload() {
-            if ($this->isEventOn('beforeProcessFileUpload')) {
-                $this->callWebhook('beforeProcessFileUpload');
-            }
-            return;
-        }
-    
-        public function beforePluginManagerMenuRender() {
-            if ($this->isEventOn('beforePluginManagerMenuRender')) {
-                $this->callWebhook('beforePluginManagerMenuRender');
-            }
-            return;
-        }
-    
-        public function beforeQuestionRender() {
-            if ($this->isEventOn('beforeQuestionRender')) {
-                $this->callWebhookSurvey('beforeQuestionRender');
-            }
-            return;
-        }
-    
-        public function beforeRegister() {
-            if ($this->isEventOn('beforeRegister')) {
-                $this->callWebhook('beforeRegister');
-            }
-            return;
-        }
-    
-        public function beforeRegisterForm() {
-            if ($this->isEventOn('beforeRegisterForm')) {
-                $this->callWebhook('beforeRegisterForm');
-            }
-            return;
-        }
-    
-        public function beforeSideMenuRender() {
-            if ($this->isEventOn('beforeSideMenuRender')) {
-                $this->callWebhook('beforeSideMenuRender');
-            }
-            return;
-        }
-    
-        public function beforeSurveyAdminView() {
-            if ($this->isEventOn('beforeSurveyAdminView')) {
-                $this->callWebhookSurvey('beforeSurveyAdminView');
-            }
-            return;
-        }
-    
-        public function beforeSurveyActivate() {
-            if ($this->isEventOn('beforeSurveyActivate')) {
-                $this->callWebhookSurvey('beforeSurveyActivate');
-            }
-            return;
-        }
-    
-        public function beforeSurveyBarRender() {
-            if ($this->isEventOn('beforeSurveyBarRender')) {
-                $this->callWebhookSurvey('beforeSurveyBarRender');
-            }
-            return;
-        }
-    
-        public function beforeSurveyDeactivate() {
-            if ($this->isEventOn('beforeSurveyDeactivate')) {
-                $this->callWebhookSurvey('beforeSurveyDeactivate');
-            }
-            return;
-        }
-    
-        public function beforeSurveyPage() {
-            if ($this->isEventOn('beforeSurveyPage')) {
-                $this->callWebhookSurvey('beforeSurveyPage');
-            }
-            return;
-        }
-    
-        public function beforeSurveySettings() {
-            if ($this->isEventOn('beforeSurveySettings')) {
-                $this->callWebhookSurvey('beforeSurveySettings');
-            }
-            return;
-        }
-    
-        public function beforeTwigRenderTemplate() {
-            if ($this->isEventOn('beforeTwigRenderTemplate')) {
-                $this->callWebhook('beforeTwigRenderTemplate');
-            }
-            return;
-        }
-    
-        public function beforeToolsMenuRender() {
-            if ($this->isEventOn('beforeToolsMenuRender')) {
-                $this->callWebhook('beforeToolsMenuRender');
-            }
-            return;
-        }
-    
-        public function beforeUrlCheck() {
-            if ($this->isEventOn('beforeUrlCheck')) {
-                $this->callWebhook('beforeUrlCheck');
-            }
-            return;
-        }
-    
-        public function beforeWelcomePageRender() {
-            if ($this->isEventOn('beforeWelcomePageRender')) {
-                $this->callWebhook('beforeWelcomePageRender');
-            }
-            return;
-        }
-    
-        public function createNewUser() {
-            if ($this->isEventOn('createNewUser')) {
-                $this->callWebhook('createNewUser');
-            }
-            return;
-        }
-    
-        public function createRandomPassword() {
-            if ($this->isEventOn('createRandomPassword')) {
-                $this->callWebhook('createRandomPassword');
-            }
-            return;
-        }
-    
-        public function checkPasswordRequirement() {
-            if ($this->isEventOn('checkPasswordRequirement')) {
-                $this->callWebhook('checkPasswordRequirement');
-            }
-            return;
-        }
-    
-        public function ExpressionManagerStart() {
-            if ($this->isEventOn('ExpressionManagerStart')) {
-                $this->callWebhook('ExpressionManagerStart');
-            }
-            return;
-        }
-    
-        public function getGlobalBasePermissions() {
-            if ($this->isEventOn('getGlobalBasePermissions')) {
-                $this->callWebhook('getGlobalBasePermissions');
-            }
-            return;
-        }
-    
-        public function getPluginTwigPath() {
-            if ($this->isEventOn('getPluginTwigPath')) {
-                $this->callWebhook('getPluginTwigPath');
-            }
-            return;
-        }
-    
-        public function getValidScreenFiles() {
-            if ($this->isEventOn('getValidScreenFiles')) {
-                $this->callWebhook('getValidScreenFiles');
-            }
-            return;
-        }
-    
-        public function listExportOptions() {
-            if ($this->isEventOn('listExportOptions')) {
-                $this->callWebhook('listExportOptions');
-            }
-            return;
-        }
-    
-        public function listExportPlugins() {
-            if ($this->isEventOn('listExportPlugins')) {
-                $this->callWebhook('listExportPlugins');
-            }
-            return;
-        }
-    
-        public function listQuestionPlugins() {
-            if ($this->isEventOn('listQuestionPlugins')) {
-                $this->callWebhook('listQuestionPlugins');
-            }
-            return;
-        }
-    
-        public function newDirectRequest() {
-            if ($this->isEventOn('newDirectRequest')) {
-                $this->callWebhook('newDirectRequest');
-            }
-            return;
-        }
-    
-        public function newExport() {
-            if ($this->isEventOn('newExport')) {
-                $this->callWebhook('newExport');
-            }
-            return;
-        }
-    
-        public function newQuestionAttributes() {
-            if ($this->isEventOn('newQuestionAttributes')) {
-                $this->callWebhookSurvey('newQuestionAttributes');
-            }
-            return;
-        }
-    
-        public function newSurveySettings() {
-            if ($this->isEventOn('newSurveySettings')) {
-                $this->callWebhookSurvey('newSurveySettings');
-            }
-            return;
-        }
-    
-        public function NewUnsecureRequest() {
-            if ($this->isEventOn('NewUnsecureRequest')) {
-                $this->callWebhook('NewUnsecureRequest');
-            }
-            return;
-        }
-    
-        public function onSurveyDenied() {
-            if ($this->isEventOn('onSurveyDenied')) {
-                $this->callWebhookSurvey('onSurveyDenied');
-            }
-            return;
-        }
-    
-        public function setVariableExpressionEnd() {
-            if ($this->isEventOn('setVariableExpressionEnd')) {
-                $this->callWebhook('setVariableExpressionEnd');
-            }
-            return;
-        }
-    
-        public function saveSurveyForm() {
-            if ($this->isEventOn('saveSurveyForm')) {
-                $this->callWebhookSurvey('saveSurveyForm');
-            }
-            return;
-        }
-    
-        public function newLoginForm() {
-            if ($this->isEventOn('newLoginForm')) {
-                $this->callWebhook('newLoginForm');
-            }
-            return;
-        }
-    
-        public function afterLoginFormSubmit() {
-            if ($this->isEventOn('afterLoginFormSubmit')) {
-                $this->callWebhook('afterLoginFormSubmit');
-            }
-            return;
-        }
-    
-        public function afterSuccessfulLogin() {
-            if ($this->isEventOn('afterSuccessfulLogin')) {
-                $this->callWebhook('afterSuccessfulLogin');
-            }
-            return;
-        }
-    
-        public function newUserLogin() {
-            if ($this->isEventOn('newUserLogin')) {
-                $this->callWebhook('newUserLogin');
-            }
-            return;
-        }
-    
-        public function newUserSession() {
-            if ($this->isEventOn('newUserSession')) {
-                $this->callWebhook('newUserSession');
-            }
-            return;
-        }
-    
-        public function afterLogout() {
-            if ($this->isEventOn('afterLogout')) {
-                $this->callWebhook('afterLogout');
-            }
-            return;
-        }
-    
-        public function afterFailedLoginAttempt() {
-            if ($this->isEventOn('afterFailedLoginAttempt')) {
-                $this->callWebhook('afterFailedLoginAttempt');
-            }
-            return;
-        }
-    
-        public function remoteControlLogin() {
-            if ($this->isEventOn('remoteControlLogin')) {
-                $this->callWebhook('remoteControlLogin');
-            }
-            return;
-        }
-    
-        public function afterReceiveOAuthResponse() {
-            if ($this->isEventOn('afterReceiveOAuthResponse')) {
-                $this->callWebhook('afterReceiveOAuthResponse');
-            }
-            return;
-        }
-    
-        public function afterSelectEmailPlugin() {
-            if ($this->isEventOn('afterSelectEmailPlugin')) {
-                $this->callWebhook('afterSelectEmailPlugin');
-            }
-            return;
-        }
-    
-        public function beforeEmail() {
-            if ($this->isEventOn('beforeEmail')) {
-                $this->callWebhook('beforeEmail');
-            }
-            return;
-        }
-    
-        public function beforeSurveyEmail() {
-            if ($this->isEventOn('beforeSurveyEmail')) {
-                $this->callWebhook('beforeSurveyEmail');
-            }
-            return;
-        }
-    
-        public function beforeTokenEmail() {
-            if ($this->isEventOn('beforeTokenEmail')) {
-                $this->callWebhook('beforeTokenEmail');
-            }
-            return;
-        }
-    
-        public function beforeEmailDispatch() {
-            if ($this->isEventOn('beforeEmailDispatch')) {
-                $this->callWebhook('beforeEmailDispatch');
-            }
-            return;
-        }
-    
-        public function beforePrepareRedirectToAuthPage() {
-            if ($this->isEventOn('beforePrepareRedirectToAuthPage')) {
-                $this->callWebhook('beforePrepareRedirectToAuthPage');
-            }
-            return;
-        }
-    
-        public function beforeRedirectToAuthPage() {
-            if ($this->isEventOn('beforeRedirectToAuthPage')) {
-                $this->callWebhook('beforeRedirectToAuthPage');
-            }
-            return;
-        }
-    
-        public function listEmailPlugins() {
-            if ($this->isEventOn('listEmailPlugins')) {
-                $this->callWebhook('listEmailPlugins');
-            }
-            return;
-        }
-    
-        public function MailerConstruct() {
-            if ($this->isEventOn('MailerConstruct')) {
-                $this->callWebhook('MailerConstruct');
-            }
-            return;
-        }
-    
-        public function beforeSurveyDelete() {
-            if ($this->isEventOn('beforeSurveyDelete')) {
-                $this->callWebhookSurvey('beforeSurveyDelete');
-            }
-            return;
-        }
-    
-        public function beforeSurveySave() {
-            if ($this->isEventOn('beforeSurveySave')) {
-                $this->callWebhookSurvey('beforeSurveySave');
-            }
-            return;
-        }
-    
-        public function afterSurveyDelete() {
-            if ($this->isEventOn('afterSurveyDelete')) {
-                $this->callWebhookSurvey('afterSurveyDelete');
-            }
-            return;
-        }
-    
-        public function afterSurveySave() {
-            if ($this->isEventOn('afterSurveySave')) {
-                $this->callWebhookSurvey('afterSurveySave');
-            }
-            return;
-        }
-    
-        public function beforeTokenDelete() {
-            if ($this->isEventOn('beforeTokenDelete')) {
-                $this->callWebhook('beforeTokenDelete');
-            }
-            return;
-        }
-    
-        public function beforeTokenSave() {
-            if ($this->isEventOn('beforeTokenSave')) {
-                $this->callWebhook('beforeTokenSave');
-            }
-            return;
-        }
-    
-        public function afterTokenDelete() {
-            if ($this->isEventOn('afterTokenDelete')) {
-                $this->callWebhook('afterTokenDelete');
-            }
-            return;
-        }
-    
-        public function afterTokenSave() {
-            if ($this->isEventOn('afterTokenSave')) {
-                $this->callWebhook('afterTokenSave');
-            }
-            return;
-        }
-    
-        public function beforeResponseDelete() {
-            if ($this->isEventOn('beforeResponseDelete')) {
-                $this->callWebhook('beforeResponseDelete');
-            }
-            return;
-        }
-    
-        public function beforeResponseSave() {
-            if ($this->isEventOn('beforeResponseSave')) {
-                $this->callWebhook('beforeResponseSave');
-            }
-            return;
-        }
-    
-        public function afterResponseDelete() {
-            if ($this->isEventOn('afterResponseDelete')) {
-                $this->callWebhook('afterResponseDelete');
-            }
-            return;
-        }
-    
-        public function afterResponseSave() {
-            if ($this->isEventOn('afterResponseSave')) {
-                $this->callWebhook('afterResponseSave');
-            }
-            return;
-        }
-    
-        public function beforeTokenDynamicDelete() {
-            if ($this->isEventOn('beforeTokenDynamicDelete')) {
-                $this->callWebhook('beforeTokenDynamicDelete');
-            }
-            return;
-        }
-    
-        public function beforeTokenDynamicSave() {
-            if ($this->isEventOn('beforeTokenDynamicSave')) {
-                $this->callWebhook('beforeTokenDynamicSave');
-            }
-            return;
-        }
-    
-        public function afterTokenDynamicDelete() {
-            if ($this->isEventOn('afterTokenDynamicDelete')) {
-                $this->callWebhook('afterTokenDynamicDelete');
-            }
-            return;
-        }
-    
-        public function afterTokenDynamicSave() {
-            if ($this->isEventOn('afterTokenDynamicSave')) {
-                $this->callWebhook('afterTokenDynamicSave');
-            }
-            return;
-        }
-    
-        public function beforeSurveyDynamicDelete() {
-            if ($this->isEventOn('beforeSurveyDynamicDelete')) {
-                $this->callWebhook('beforeSurveyDynamicDelete');
-            }
-            return;
-        }
-    
-        public function beforeSurveyDynamicSave() {
-            if ($this->isEventOn('beforeSurveyDynamicSave')) {
-                $this->callWebhook('beforeSurveyDynamicSave');
-            }
-            return;
-        }
-    
-        public function afterSurveyDynamicDelete() {
-            if ($this->isEventOn('afterSurveyDynamicDelete')) {
-                $this->callWebhook('afterSurveyDynamicDelete');
-            }
-            return;
-        }
-    
-        public function afterSurveyDynamicSave() {
-            if ($this->isEventOn('afterSurveyDynamicSave')) {
-                $this->callWebhook('afterSurveyDynamicSave');
-            }
-            return;
-        }
-    
-        public function beforeModelDelete() {
-            if ($this->isEventOn('beforeModelDelete')) {
-                $this->callWebhook('beforeModelDelete');
-            }
-            return;
-        }
-    
-        public function beforeModelSave() {
-            if ($this->isEventOn('beforeModelSave')) {
-                $this->callWebhook('beforeModelSave');
-            }
-            return;
-        }
-    
-        public function afterModelDelete() {
-            if ($this->isEventOn('afterModelDelete')) {
-                $this->callWebhook('afterModelDelete');
-            }
-            return;
-        }
-    
-        public function afterModelSave() {
-            if ($this->isEventOn('afterModelSave')) {
-                $this->callWebhook('afterModelSave');
-            }
-            return;
-        }
-
         /***** ***** ***** ***** *****
 		* Calls a webhook
 		* @return array | response
@@ -892,6 +828,13 @@ class LimeSurveyWebhook extends PluginBase
             }
             $event = $this->getEvent();
 
+            $reflection = new ReflectionObject($event);
+            $property = $reflection->getProperty('_parameters');
+            $property->setAccessible(true);  // Make the property accessible
+
+            // Now you can get the value of _parameters
+            $parameters["event_parameters"] = $property->getValue($event);
+
             $bug = (boolean)$this->getGlobalSetting('sBug');
             $url = $this->getGlobalSetting('sUrl');              
             // Validate webhook URL
@@ -899,7 +842,6 @@ class LimeSurveyWebhook extends PluginBase
                 error_log('Invalid webhook URL: ' . $url);
                 return; // Exit if the URL is not valid
             }
-
             if(!key_exists("events", $parameters)) {
                 $parameters["event"] = $comment;
             }
@@ -1117,141 +1059,145 @@ class LimeSurveyWebhook extends PluginBase
                 }
                 return [];
             }
-
-            /**
-            * Return global default permission
-            * @return string
-            */
-            private static function getDefaultEvents() {
-                return json_encode([
-                    'authentification' => [
-                        'beforeRegister'=> false,
-                        'beforeRegisterForm'=> false,
-                        'createNewUser'=> false,
-                        'createRandomPassword'=> false,
-                        'checkPasswordRequirement'=> false,
-                        'newLoginForm'=> false,
-                        'afterLoginFormSubmit'=> false,
-                        'afterSuccessfulLogin'=> false,
-                        'newUserLogin'=> false,
-                        'newUserSession'=> false,
-                        'afterLogout'=> false,
-                        'afterFailedLoginAttempt'=> false,
-                        'remoteControlLogin'=> false
-                    ],
-                    'admin' => [
-                        'afterGenerateToken'=> false,
-                        'afterPluginLoad'=> false,
-                        'afterQuickMenuLoad'=> false,
-                        'beforeAdminMenuRender'=> false,
-                        'beforeCloseHtml'=> false,
-                        'beforeControllerAction'=> false,
-                        'beforeHasPermission'=> false,
-                        'beforePermissionSetSave'=> false,
-                        'beforeProcessFileUpload'=> false,
-                        'beforePluginManagerMenuRender'=> false,
-                        'beforeSideMenuRender'=> false,
-                        'beforeTwigRenderTemplate'=> false,
-                        'beforeToolsMenuRender'=> false,
-                        'beforeUrlCheck'=> false,
-                        'beforeWelcomePageRender'=> false,
-                        'ExpressionManagerStart'=> false,
-                        'getGlobalBasePermissions'=> false,
-                        'getPluginTwigPath'=> false,
-                        'getValidScreenFiles'=> false,
-                        'listExportOptions'=> false,
-                        'listExportPlugins'=> false,
-                        'listQuestionPlugins'=> false,
-                        'newDirectRequest'=> false,
-                        'newExport'=> false,
-                        'NewUnsecureRequest'=> false,
-                        'setVariableExpressionEnd'=> false
-                    ],
-                    'survey' => [
-                        'afterFindSurvey'=> false,
-                        'afterSurveyActivate'=> false,
-                        'afterSurveyComplete'=> false,
-                        'afterSurveyDeactivate'=> false,
-                        'afterSurveyQuestionAssessment'=> false,
-                        'afterSurveyQuota'=> false,
-                        'afterSurveySettingsSave'=> false,
-                        'beforeActivate'=> false,
-                        'beforeDeactivate'=> false,
-                        'beforeLoadResponse'=> false,
-                        'beforeQuestionRender'=> false,
-                        'beforeSurveyAdminView'=> false,
-                        'beforeSurveyActivate'=> false,
-                        'beforeSurveyBarRender'=> false,
-                        'beforeSurveyDeactivate'=> false,
-                        'beforeSurveyPage'=> false,
-                        'beforeSurveySettings'=> false,
-                        'newQuestionAttributes'=> false,
-                        'newSurveySettings'=> false,
-                        'onSurveyDenied'=> false,
-                        'saveSurveyForm'=> false,
-                        'beforeSurveyDelete'=> false,
-                        'beforeSurveySave'=> false,
-                        'afterSurveyDelete'=> false,
-                        'afterSurveySave'=> false
-                    ],
-                    'dynamicmodel' => [
-                        'beforeTokenDelete'=> false,
-                        'beforeTokenSave'=> false,
-                        'afterTokenDelete'=> false,
-                        'afterTokenSave'=> false,
-                        'beforeResponseDelete'=> false,
-                        'beforeResponseSave'=> false,
-                        'afterResponseDelete'=> false,
-                        'afterResponseSave'=> false,
-                        'beforeTokenDynamicDelete'=> false,
-                        'beforeTokenDynamicSave'=> false,
-                        'afterTokenDynamicDelete'=> false,
-                        'afterTokenDynamicSave'=> false,
-                        'beforeSurveyDynamicDelete'=> false,
-                        'beforeSurveyDynamicSave'=> false,
-                        'afterSurveyDynamicDelete'=> false,
-                        'afterSurveyDynamicSave'=> false,
-                        'beforeModelDelete'=> false,
-                        'beforeModelSave'=> false,
-                        'afterModelDelete'=> false,
-                        'afterModelSave'=> false
-                    ],
-                    'email' => [
-                        'afterReceiveOAuthResponse'=> false,
-                        'afterSelectEmailPlugin'=> false,
-                        'beforeEmail'=> false,
-                        'beforeSurveyEmail'=> false,
-                        'beforeTokenEmail'=> false,
-                        'beforeEmailDispatch'=> false,
-                        'beforePrepareRedirectToAuthPage'=> false,
-                        'beforeRedirectToAuthPage'=> false,
-                        'listEmailPlugins'=> false,
-                        'MailerConstruct'=> false
-                    ],
-        ]);
-    }
-            /**
-            * Get the hidden settings name
-             * @return boolean
-             */
-            private function isEventOn($event) {
-                $bug = $this->getGlobalSetting('sBug');
-                $eventsGlobalSettings=json_decode($this->getGlobalSetting(
-                    'events',
-                    $this->getDefaultEvents()
-                ), true);
-                foreach ($eventsGlobalSettings as $category => $events) {
-                    if (array_key_exists($event, $events)) {
-                        $isOn = $events[$event];
-                        if($bug) {
-                            error_log("Category : " . $category . " | Event : " .$event . " | Event Status: " . json_encode($isOn));
-                        }
-                        if ($isOn === true) {  // Compare with boolean true, not string
-                            error_log("Event Triggered: " . $event);
-                            return true;
-                        }
+        /**
+         * Return global default permission
+         * @return string
+         */
+        private static function getDefaultEvents() {
+            return json_encode([
+                'render' => [
+                  'beforeAdminMenuRender' => false,
+                  'beforePluginManagerMenuRender' => false,
+                  'beforeQuestionRender' => false,
+                  'beforeSideMenuRender' => false,
+                  'beforeSurveyBarRender' => false,
+                  'beforeTwigRenderTemplate' => false,
+                  'beforeToolsMenuRender' => false,
+                  'beforeWelcomePageRender' => false,
+                ],
+                'authentification' => [
+                  'beforeRegister' => false,
+                  'beforeRegisterForm' => false,
+                  'createNewUser' => false,
+                  'createRandomPassword' => false,
+                  'checkPasswordRequirement' => false,
+                ],
+                'admin' => [
+                  'afterQuickMenuLoad' => false,
+                  'beforeCloseHtml' => false,
+                  'beforeControllerAction' => false,
+                  'beforeHasPermission' => false,
+                  'beforePermissionSetSave' => false,
+                  'beforeProcessFileUpload' => false,
+                  'beforeUrlCheck' => false,
+                  'ExpressionManagerStart' => false,
+                  'getGlobalBasePermissions' => false,
+                  'getValidScreenFiles' => false,
+                  'listExportOptions' => false,
+                  'newDirectRequest' => false,
+                  'newExport' => false,
+                  'NewUnsecureRequest' => false,
+                  'setVariableExpressionEnd' => false,
+                ],
+                'surveyStatus' => [
+                  'afterSurveyComplete' => false,
+                  'beforeSurveyPage' => false,
+                  'onSurveyDenied' => false,
+                ],
+                'plugin' => [
+                  'afterPluginLoad' => false,
+                  'getPluginTwigPath' => false,
+                  'listExportPlugins' => false,
+                  'listQuestionPlugins' => false,
+                ],
+                'dynamicmodel' => [
+                  'beforeModelDelete' => false,
+                  'beforeModelSave' => false,
+                  'afterModelDelete' => false,
+                  'afterModelSave' => false,
+                ],
+                'email' => [
+                  'afterReceiveOAuthResponse' => false,
+                  'afterSelectEmailPlugin' => false,
+                  'beforeEmail' => false,
+                  'beforeSurveyEmail' => false,
+                  'beforeTokenEmail' => false,
+                  'beforeEmailDispatch' => false,
+                  'beforePrepareRedirectToAuthPage' => false,
+                  'beforeRedirectToAuthPage' => false,
+                  'listEmailPlugins' => false,
+                  'MailerConstruct' => false,
+                ],
+                'dynamicsurvey' => [
+                  'beforeSurveyDynamicDelete' => false,
+                  'beforeSurveyDynamicSave' => false,
+                  'afterSurveyDynamicDelete' => false,
+                  'afterSurveyDynamicSave' => false,
+                ],
+                'response' => [
+                  'beforeResponseDelete' => false,
+                  'beforeResponseSave' => false,
+                  'afterResponseDelete' => false,
+                  'afterResponseSave' => false,
+                ],
+                'token' => [
+                  'afterGenerateToken' => false,
+                  'beforeTokenDelete' => false,
+                  'beforeTokenSave' => false,
+                  'afterTokenDelete' => false,
+                  'afterTokenSave' => false,
+                  'beforeTokenDynamicDelete' => false,
+                  'beforeTokenDynamicSave' => false,
+                  'afterTokenDynamicDelete' => false,
+                  'afterTokenDynamicSave' => false,
+                ],
+                'surveyAdmin' => [
+                  'afterFindSurvey' => false,
+                  'afterSurveyActivate' => false,
+                  'afterSurveyDeactivate' => false,
+                  'afterSurveyQuestionAssessment' => false,
+                  'afterSurveyQuota' => false,
+                  'afterSurveySettingsSave' => false,
+                  'beforeActivate' => false,
+                  'beforeDeactivate' => false,
+                  'beforeLoadResponse' => false,
+                  'beforeSurveyAdminView' => false,
+                  'beforeSurveyActivate' => false,
+                  'beforeSurveyDeactivate' => false,
+                  'beforeSurveySettings' => false,
+                  'newQuestionAttributes' => false,
+                  'newSurveySettings' => false,
+                  'saveSurveyForm' => false,
+                  'beforeSurveyDelete' => false,
+                  'beforeSurveySave' => false,
+                  'afterSurveyDelete' => false,
+                  'afterSurveySave' => false,
+                ],
+            ]);
+        }
+        
+        /**
+        * Get the hidden settings name
+         * @return boolean
+         */
+        private function isEventOn($event) {
+            $bug = $this->getGlobalSetting('sBug');
+            $eventsGlobalSettings=json_decode($this->getGlobalSetting(
+                'events',
+                $this->getDefaultEvents()
+            ), true);
+            foreach ($eventsGlobalSettings as $category => $events) {
+                if (array_key_exists($event, $events)) {
+                    $isOn = $events[$event];
+                    if($bug) {
+                        error_log("Category : " . $category . " | Event : " .$event . " | Event Status: " . json_encode($isOn));
                     }
+                    if ($isOn) {  // Compare with boolean true, not string
+                        error_log("Event Triggered: " . $event);
+                    }
+                    return $isOn;
                 }
-                return false;
             }
+            return false;
+        }
     }
