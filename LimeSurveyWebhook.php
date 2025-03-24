@@ -98,27 +98,39 @@ class LimeSurveyWebhook extends PluginBase
                     ],
                     'label' => 'Enable Debug Mode',
                     'help' => 'Enable debugmode to see what data is transmitted. Respondents will see this as well so you should turn this off for live surveys'
-                )
+                ),
+                'events' => array(
+                    'type' => 'json',
+                    'label' => $this->gT('Events to send to the webhook server'),
+                    'help' => sprintf(
+                        $this->gT('A JSON object describing the events to send to the webhook server. The JSON object has the following form: %s'),
+                        CHtml::tag('pre', [], "{\n\t\"admin\": { ... },\n\t\"surveys\": {\n\t\t\"beforeSurveyPage\": true,\n\t\t\"afterSurveyComplete\": false,\n\t},\n\t\"users\": { ... },\n\t...\n}")
+                    ),
+                    'editorOptions' => array('mode' => 'tree'),
+                    'default' => $this->getGlobalSetting(
+                        'events',
+                        self::getDefaultEvents()
+                    ),
+                    'htmlOptions' => [
+                        'disabled' => in_array('events', $fixedPluginSettings)
+                    ],
+                ),
 		    );
 
             /* Get current */
             $pluginSettings = parent::getPluginSettings($getValues);
-            error_log(json_encode($pluginSettings));
             /* Update current for fixed one */
             if ($getValues) {
                 foreach ($fixedPluginSettings as $setting) {
                     $pluginSettings[$setting]['current'] = $this->getGlobalSetting($setting);
                 }
             }
-            error_log(json_encode($pluginSettings));
             /* Remove hidden */
             foreach ($this->getHiddenGlobalSetting() as $setting) {
                 unset($pluginSettings[$setting]);
             }
-            error_log(json_encode($pluginSettings));
             return $pluginSettings;
         }
-
         
 		/***** ***** ***** ***** *****
 		* Send the webhook on completion of a survey
@@ -127,17 +139,11 @@ class LimeSurveyWebhook extends PluginBase
 		public function beforeSurveyPage()
         {
             $oEvent = $this->getEvent();
-            $surveyId = $oEvent->get('surveyId');
-            error_log("survey_initialized : " . $surveyId);
-            $hookSurveyId = $this->getGlobalSetting('sId','');
-            $hookSurveyIdArray = explode(',', preg_replace('/\s+/', '', $hookSurveyId));
-            if (in_array($surveyId, $hookSurveyIdArray) || $hookSurveyId == '')
-                {
-                    $this->callWebhook('beforeSurveyPage');
-                }
+            if($this->isEventOn('beforeSurveyPage')) {
+                $this->callWebhookSurvey('beforeSurveyPage');
+            }
             return;
         }
-
 
 		/***** ***** ***** ***** *****
 		* Send the webhook on completion of a survey
@@ -145,28 +151,67 @@ class LimeSurveyWebhook extends PluginBase
 		***** ***** ***** ***** *****/
 		public function afterSurveyComplete()
 		{
-            $oEvent = $this->getEvent();
-            $surveyId = $oEvent->get('surveyId');
-            error_log("survey_completed : " . $surveyId);
-            $hookSurveyId = $this->getGlobalSetting('sId','');
-            $hookSurveyIdArray = explode(',', preg_replace('/\s+/', '', $hookSurveyId));
-            if (in_array($surveyId, $hookSurveyIdArray) || $hookSurveyId == '') 
-            {
-                $this->callWebhook('afterSurveyComplete');
+            if($this->isEventOn('afterSurveyComplete')) {
+                $this->callWebhookSurvey('afterSurveyComplete');
             }
             return;
 		}
+
+        /***** ***** ***** ***** *****
+		* Calls a webhook
+		* @return array | response
+		***** ***** ***** ***** *****/
+		private function callWebhook($comment, $parameters=array(), $time_start=null)
+        {
+            if(!$time_start) {
+                $time_start=microtime(true);
+            }
+            $event = $this->getEvent();
+
+            $url = $this->getGlobalSetting('sUrl');                
+            // Validate webhook URL
+            if (filter_var($url, FILTER_VALIDATE_URL) === false) {
+                error_log('Invalid webhook URL: ' . $url);
+                return; // Exit if the URL is not valid
+            }
+            error_log($url);
+
+            if(!key_exists("events", $parameters)) {
+                $parameters["event"] = $comment;
+            }
+            if(!key_exists("time", $parameters)) {
+                // Convert to DateTime
+                $utcDateTime = DateTime::createFromFormat("U.u", number_format($time_start, 6, '.', ''));
+                $utcDateTime->setTimezone(new DateTimeZone("UTC")); // Ensure it's in UTC
+                error_log("UTC Time: " . $utcDateTime->format("Y-m-d H:i:s.u") . " UTC.");
+                $parameters["time"] = $utcDateTime->format("Y-m-d H:i:s.u"). " UTC";
+            }
+
+            $postData=json_encode($parameters);
+            $hookSent = $this->httpPost($url, $postData);
+
+            $this->debug($url, $parameters, $hookSent, $time_start, $comment);
+
+            return;
+        }
 
 		/***** ***** ***** ***** *****
 		* Calls a webhook
 		* @return array | response
 		***** ***** ***** ***** *****/
-		private function callWebhook($comment)
+		private function callWebhookSurvey($comment)
 			{
-				$time_start = microtime(true);
-				$event = $this->getEvent();
-                error_log(json_encode($event));
+                $event = $this->getEvent();
                 $surveyId = $event->get('surveyId');
+                $hookSurveyId = $this->getGlobalSetting('sId','');
+                $hookSurveyIdArray = explode(',', preg_replace('/\s+/', '', $hookSurveyId));
+                if (!$hookSurveyId == '') {
+                    if(!in_array($surveyId, $hookSurveyIdArray)) {
+                        return;
+                    }
+                }
+                error_log($comment . " : " . $surveyId);
+                $time_start=microtime(true);
 
                 // Try to fetch the current from the URL manually or default language
                 $surveyInfo = Survey::model()->findByPk($surveyId);
@@ -175,17 +220,7 @@ class LimeSurveyWebhook extends PluginBase
 
                 // Get token from the URL manually
                 $token = Yii::app()->request->getParam('token', null);
-                error_log($token);
-
-				$url = $this->getGlobalSetting('sUrl');
-                $hookSurveyId = $this->getGlobalSetting('sId');
-                
-                // Validate webhook URL
-                if (filter_var($url, FILTER_VALIDATE_URL) === false) {
-                    error_log('Invalid webhook URL: ' . $url);
-                    return; // Exit if the URL is not valid
-                }
-                
+               
                 $parameters = array(
                     "survey" => $surveyId,
                     "event" => $comment,
@@ -202,14 +237,8 @@ class LimeSurveyWebhook extends PluginBase
                     $parameters['response'] = $response;
                     $parameters['submitDate'] = $response['submitdate'];
                 }
-                error_log($url);
-                $postData=json_encode($parameters);
-                $hookSent = $this->httpPost($url, $postData);
 
-                error_log($comment . " | Url sent : ". $url . " | Params: ". $postData . " | Response received : " . json_encode($hookSent));
-                $this->debug($url, $parameters, $hookSent, $time_start, $comment);
-
-                return;
+                return $this->callWebhook($comment, $parameters, $time_start);
             }
 
         private function getLastResponse($surveyId, $additionalFields)
@@ -277,7 +306,7 @@ class LimeSurveyWebhook extends PluginBase
                     $signingHeaderName = $this->getGlobalSetting('sHeaderSignatureName');
                     $signingPrefix = $this->getGlobalSetting('sHeaderSignaturePrefix');
                     // Calculate HMAC
-                    $signature = hash_hmac("sha256", $sigPrefix . $postData, $signingSecret);
+                    $signature = hash_hmac("sha256", $signingPrefix . $postData, $signingSecret);
                     $headerToAdd="$signingHeaderName: $signature";
                     $headers[] = $headerToAdd;
                 }
@@ -299,9 +328,10 @@ class LimeSurveyWebhook extends PluginBase
         ***** ***** ***** ***** *****/
         private function debug($url, $parameters, $hookSent, $time_start, $comment)
             {
-                if ($this->getGlobalSetting('sBug', false))
+                $bug=(boolean)$this->getGlobalSetting('sBug', 0);
+                if ($bug)
                   {
-                    $this->log($comment);
+                    error_log($comment . " | Url sent : ". $url . " | Params: ". json_encode($parameters) . " | Response received : " . json_encode($hookSent));
                     $html = '<pre><br><br>----------------------------- DEBUG ----------------------------- <br><br>';
                     $html .= 'Comment: <br>' . print_r($comment, true);
                     $html .= '<br><br>Parameters: <br>' . print_r($parameters, true);
@@ -357,5 +387,38 @@ class LimeSurveyWebhook extends PluginBase
                     return $WebhookSettings['hidden'];
                 }
                 return [];
+            }
+
+            /**
+             * Return global default permission
+            * @return string
+            */
+            private static function getDefaultEvents()
+            {
+                return json_encode([
+                    'surveys' => [
+                        'beforeSurveyPage' => true,
+                        'afterSurveyComplete' => true,
+                    ],
+                ]);
+            }
+            /**
+            * Get the hidden settings name
+             * @return boolean
+             */
+            private function isEventOn($event) {
+                $eventsGlobalSettings=json_decode($this->getGlobalSetting('events'), true);
+                //error_log(json_encode($eventsGlobalSettings));
+                foreach ($eventsGlobalSettings as $category => $events) {
+                    if (array_key_exists($event, $events)) {
+                        $isOn = $events[$event];
+                        error_log("Category : " . $category . " | Event : " .$event . " | Event Status: " . json_encode($isOn));
+                        if ($isOn === true) {  // Compare with boolean true, not string
+                            error_log("Event Triggered: " . $event);
+                            return true;
+                        }
+                    }
+                }
+                return false;
             }
     }
