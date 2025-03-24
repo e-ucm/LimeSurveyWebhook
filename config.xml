@@ -9,7 +9,7 @@
         <version>1.1.0</version>
         <lastSecurityUpdate>1.1.0</lastSecurityUpdate>
         <license>-</license>
-        <description>Triggers an API call when a survey is begining and when is completed.</description>
+        <description>Triggers an API call when an event is detected.</description>
     </metadata>
 
 	<compatibility>
