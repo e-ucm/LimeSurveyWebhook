@@ -892,7 +892,7 @@ class LimeSurveyWebhook extends PluginBase
                 $token = Yii::app()->request->getParam('token', null);
 
                 $details = array(
-                    "surveyid" => $surveyId,
+                    "surveyId" => $surveyId,
                     'lang' => $lang,
                     "token" => $token
                 );
