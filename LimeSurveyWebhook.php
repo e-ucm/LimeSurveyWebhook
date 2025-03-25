@@ -821,45 +821,41 @@ class LimeSurveyWebhook extends PluginBase
 		* Calls a webhook
 		* @return array | response
 		***** ***** ***** ***** *****/
-		private function callWebhook($comment, $parameters=array(), $time_start=null)
+		private function callWebhook($comment, $details=null, $time_start=null)
         {
             if(!$time_start) {
                 $time_start=microtime(true);
             }
-            $event = $this->getEvent();
-
-            $reflection = new ReflectionObject($event);
-            $property = $reflection->getProperty('_parameters');
-            $property->setAccessible(true);  // Make the property accessible
-
-            // Now you can get the value of _parameters
-            $parameters["event_parameters"] = $property->getValue($event);
-
-            $bug = (boolean)$this->getGlobalSetting('sBug');
             $url = $this->getGlobalSetting('sUrl');              
             // Validate webhook URL
             if (filter_var($url, FILTER_VALIDATE_URL) === false) {
                 error_log('Invalid webhook URL: ' . $url);
                 return; // Exit if the URL is not valid
             }
-            if(!key_exists("events", $parameters)) {
-                $parameters["event"] = $comment;
-            }
-            if(!key_exists("time", $parameters)) {
-                // Convert to DateTime
-                $utcDateTime = DateTime::createFromFormat("U.u", number_format($time_start, 6, '.', ''));
-                $utcDateTime->setTimezone(new DateTimeZone("UTC")); // Ensure it's in UTC
-                if($bug) {
-                    error_log("UTC Time: " . $utcDateTime->format("Y-m-d H:i:s.u") . " UTC.");
-                }
-                $parameters["time"] = $utcDateTime->format("Y-m-d H:i:s.u"). " UTC";
-            }
+            $bug = (boolean)$this->getGlobalSetting('sBug');
+            $parameters=array();
+            $parameters["event"] = $comment;
 
+            if($details==null) {
+                $event = $this->getEvent();
+                $reflection = new ReflectionObject($event);
+                $property = $reflection->getProperty('_parameters');
+                $property->setAccessible(true);  // Make the property accessible
+
+                // Now you can get the value of _parameters
+                $details = $property->getValue($event);
+            }
+            $parameters["event_details"] = $details;
+            // Convert to DateTime
+            $utcDateTime = DateTime::createFromFormat("U.u", number_format($time_start, 6, '.', ''));
+            $utcDateTime->setTimezone(new DateTimeZone("UTC")); // Ensure it's in UTC
+            if($bug) {
+                error_log("UTC Time: " . $utcDateTime->format("Y-m-d H:i:s.u") . " UTC.");
+            }
+            $parameters["datetime"] = $utcDateTime->format("Y-m-d H:i:s.u"). " UTC";
             $postData=json_encode($parameters);
             $hookSent = $this->httpPost($url, $postData);
-
             $this->debug($url, $parameters, $hookSent, $time_start, $comment);
-
             return;
         }
 
@@ -869,18 +865,24 @@ class LimeSurveyWebhook extends PluginBase
 		***** ***** ***** ***** *****/
 		private function callWebhookSurvey($comment)
 			{
+                $time_start=microtime(true);
+                $bug = (boolean)$this->getGlobalSetting('sBug');
+                
                 $event = $this->getEvent();
                 $surveyId = $event->get('surveyId');
                 $hookSurveyId = $this->getGlobalSetting('sId','');
                 $hookSurveyIdArray = explode(',', preg_replace('/\s+/', '', $hookSurveyId));
+                
                 if (!$hookSurveyId == '') {
                     if(!in_array($surveyId, $hookSurveyIdArray)) {
                         return;
                     }
                 }
-                error_log($comment . " : " . $surveyId);
-                $time_start=microtime(true);
 
+                if($bug) {
+                    error_log($comment . " : " . $surveyId);
+                }
+                
                 // Try to fetch the current from the URL manually or default language
                 $surveyInfo = Survey::model()->findByPk($surveyId);
                 $languageRequest=Yii::app()->request->getParam('lang', null);
@@ -888,10 +890,9 @@ class LimeSurveyWebhook extends PluginBase
 
                 // Get token from the URL manually
                 $token = Yii::app()->request->getParam('token', null);
-               
-                $parameters = array(
-                    "survey" => $surveyId,
-                    "event" => $comment,
+
+                $details = array(
+                    "surveyid" => $surveyId,
                     'lang' => $lang,
                     "token" => $token
                 );
@@ -899,14 +900,14 @@ class LimeSurveyWebhook extends PluginBase
                 // Include response data only for completion
                 if ($comment === 'afterSurveyComplete') {
                     $responseId = $event->get('responseId');
-                    $parameters['responseId'] = $responseId;
+                    $details['responseId'] = $responseId;
                     // Fetch response data manually from the survey table
                     $response = $this->pluginManager->getAPI()->getResponse($surveyId, $responseId);
-                    $parameters['response'] = $response;
-                    $parameters['submitDate'] = $response['submitdate'];
+                    $details['response'] = $response;
+                    $details['submitDate'] = $response['submitdate'];
                 }
 
-                return $this->callWebhook($comment, $parameters, $time_start);
+                return $this->callWebhook($comment, $details, $time_start);
             }
 
         private function getLastResponse($surveyId, $additionalFields)
