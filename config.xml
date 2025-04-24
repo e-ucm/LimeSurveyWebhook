@@ -4,15 +4,18 @@
         <name>LimeSurveyWebhook</name>
         <type>plugin</type>
         <creationDate>2023-08-26</creationDate>
-        <lastUpdate>2023-08-26</lastUpdate>
-        <author>Stefan Verweij | Evently, IrishWolf</author>
-        <version>1.0.0</version>
-        <lastSecurityUpdate>1.0.0</lastSecurityUpdate>
+        <lastUpdate>2025-03-25</lastUpdate>
+        <author>Stefan Verweij | Evently, IrishWolf | Santilario Berthilier, Julio - eUCM Team</author>
+        <authorUrl>https://github.com/e-ucm/LimeSurveyWebhook</authorUrl>
+        <version>1.1.0</version>
+        <lastSecurityUpdate>1.1.0</lastSecurityUpdate>
         <license>-</license>
-        <description>simple Webhook for LimeSurvey</description>
+        <description>Triggers an API call when an event is detected.</description>
     </metadata>
 
 	<compatibility>
+        <version>4</version>
+        <version>5</version>
         <version>6</version>
     </compatibility>
 
