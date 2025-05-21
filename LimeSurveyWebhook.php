@@ -904,7 +904,9 @@ class LimeSurveyWebhook extends PluginBase
                     // Fetch response data manually from the survey table
                     $response = $this->pluginManager->getAPI()->getResponse($surveyId, $responseId);
                     $details['response'] = $response;
-                    $details['submitDate'] = $response['submitdate'];
+                    if(is_array($response) && isset($response['submitdate'])) {
+                        $details['submitDate'] = $response['submitdate'];    
+                    }
                 }
 
                 return $this->callWebhook($comment, $details, $time_start);
