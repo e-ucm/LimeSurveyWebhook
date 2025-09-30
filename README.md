@@ -8,7 +8,6 @@ This LimeSurvey plugin allows you to send survey-related events to an external *
 ## Installation
 - go to [releases](https://github.com/e-ucm/LimeSurveyWebhook/releases) and download the latest release Zip archive
 - for LimeSurvey 5.x and above: upload the Zip archive in the plugin manager
-- for LimeSurvey 3.x: extract the Zip archive and place the contents in `<limesurvey_root>/plugins/LimeSurveyWebhook/`
 - configure the plugin in the plugin manager
 - activate the plugin in the plugin manager
 
@@ -84,9 +83,8 @@ This plugin was tested with
 
 - A recent version v6.4.3 (PHP 8.1)
 - the latest stable release v5.2.5
-- the latest LTS release v3.27.28
 
-and should work with all version 3.x or newer.
+and should work with all version 5.x or newer.
 
 The minimum required PHP version is 8.1.
 
