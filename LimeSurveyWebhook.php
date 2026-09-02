@@ -559,6 +559,17 @@ class LimeSurveyWebhook extends PluginBase
             }
 
             public function beforeSurveySave() {
+                if($this->isEventOn('afterSurveySave')) {
+                    $event = $this->getEvent();
+
+                    $survey = $event->get('model');
+
+                    if (!$survey instanceof Survey) {
+                        return;
+                    }
+
+                    $this->surveySaveState[spl_object_hash($survey)] = $survey->isNewRecord ? 'created' : 'updated';
+                }
                 if ($this->isEventOn('beforeSurveySave')) {
                     $this->callWebhook('beforeSurveySave');
                 }
@@ -574,7 +585,30 @@ class LimeSurveyWebhook extends PluginBase
 
             public function afterSurveySave() {
                 if ($this->isEventOn('afterSurveySave')) {
-                    $this->callWebhook('afterSurveySave');
+                    $event = $this->getEvent();
+                    $survey = $event->get('model');
+                    if (!$survey instanceof Survey) {
+                        return;
+                    }
+                    $surveyId = $survey->sid;
+                    $key = spl_object_hash($survey);
+
+                    $action = isset($this->surveySaveState[$key])
+                        ? $this->surveySaveState[$key]
+                        : 'updated';
+
+                    unset($this->surveySaveState[$key]);
+                    $userId = Permission::model()->getUserId();
+                    $user = $userId
+                        ? User::model()->findByPk($userId)
+                        : null;
+                    $details = array(
+                        'surveyId' => $surveyId,
+                        'action' => $action,
+                        'adminUserId' => $userId,
+                        'adminUsername' => $user ? $user->users_name : null,
+                    );
+                    $this->callWebhook('afterSurveySave', $details);
                 }
                 return;
             }
